@@ -1,0 +1,167 @@
+<html>
+<head>
+<meta charset="utf-8">
+<title>UNITAROjs</title>
+<meta name="viewport" content="width=device-width,user-scalable=no" />
+<style>
+body{
+  margin: 0px;
+  padding: 0px;
+}
+</style>
+<script src="js/unitaro.js"></script>
+<script src="js/button.js"></script>
+</head>
+<body>
+<script>
+var popnum=10;
+var popFarmer=10;
+var popFree=0;
+var popWorker=0;
+var buttonNum=1;
+var designHeight=20;
+var turnTimer=0;
+var turnNum=1;
+var time=0;
+
+var PLAYER={
+  w:10,
+  h:15,
+  color:'white',
+  speed:10,
+  init:function(x,y){
+    this.x=x;
+    this.y=y;
+  },
+  update:function(){
+    this.w= popnum / 4;
+
+  },
+  onclick:function(x,y){
+  }
+};
+
+var FARMER={
+  w:10,
+  h:15,
+  color:"white",
+  init:function(x,y){
+    this.x=x;
+    this.y=y;
+    this.w=popFarmer;
+  },
+  update:function(){
+    this.w=popFarmer / 4;
+  },
+};
+
+var WORKER={
+  w:10,
+  h:15,
+  color:"white",
+  init:function(x,y){
+    this.x=x;
+    this.y=y;
+    this.w=popWorker;
+  },
+  update:function(){
+    this.w=popWorker / 4;
+  },
+};
+
+var FREE={
+  w:0,
+  h:0,
+  color:"white",
+  init:function(x,y){
+    this.x=x;
+    this.y=y;
+  },
+  update:function(){
+    this.w=popFarmer / 4;
+  },
+};
+
+function timer(){
+  setTimeout(function(){
+    console.log(time);
+    turnTimer = 30 - time;
+    if (time >= 30){
+      time = 0;
+      turnNum++;
+    } else {
+      time++;
+    }
+    timer();
+  },1000);
+};
+
+timer();
+
+var APP = {
+  WIDTH: 320,
+  HEIGHT: 500,
+  init: function(){
+    this.player=new unitaro.Task(PLAYER,70,designHeight*2);
+    this.farmer=new unitaro.Task(FARMER,70,designHeight*3);
+    this.worker=new unitaro.Task(WORKER,70,designHeight*4);
+    this.free=new unitaro.Task(FREE,70,designHeight*6);
+    new unitaro.Task(button,70,235,70,"農民を雇う","white");
+    new unitaro.Task(button,70,260,70,"農民を解雇","white");
+    new unitaro.Task(button,150,235,70,"働人を雇う","white");
+    new unitaro.Task(button,150,260,70,"働人を解雇","white");
+    new unitaro.Task(button,180,200,30,"1","white");
+    new unitaro.Task(button,215,200,30,"10","white");
+    new unitaro.Task(button,250,200,30,"100","white");
+  },
+  update: function(age){
+    unitaro.dib.box(0,0,this.WIDTH,this.HEIGHT,"rgb(40,40,40)");
+    unitaro.dib.textout(160,20,"島ゲーム : 1000人の島にしろ！","yellow",1000);
+    popFree= popnum - popFarmer - popWorker;
+    unitaro.dib.textout(35,designHeight*2+5,"島民 : "+popnum + "人","white",100);
+    unitaro.dib.textout(35,designHeight*3+5,"農民 : "+popFarmer + "人","white",100);
+    unitaro.dib.textout(35,designHeight*4+5,"働人 : "+popWorker + "人","white",100);
+    unitaro.dib.textout(35,designHeight*5+5,"暇人 : "+popFree + "人","white",100);
+    unitaro.dib.textout(290,220,"× "+buttonNum+"人","white",100);
+    unitaro.dib.textout(70,190,"次の日になるまで : "+ turnTimer + "秒","white",200);
+    unitaro.dib.textout(200,190,"現在の日にち : " + turnNum + "日目","white",100);
+  },
+  onclick: function(x,y){
+    clickX = Math.round(x);
+    clickY = Math.round(y);
+    console.log("Xは: " + clickX);
+    console.log("Yは: " + clickY);
+    //農民を雇ったり、解雇したり
+    if (checkButton(70,235,70)) {
+      this.farmer.x += 0.125 * buttonNum;
+      popFarmer += buttonNum;
+    } else if (checkButton(70,260,70)){
+      this.farmer.x -= 0.125 * buttonNum;
+      popFarmer -= buttonNum;
+    }
+    //働人を雇ったり、解雇したり
+    if (checkButton(150,235,70)) {
+      this.worker.x += 0.125 * buttonNum;
+      popWorker += buttonNum;
+    } else if (checkButton(150,260,70)){
+      this.worker.x -= 0.125 * buttonNum;
+      popWorker -= buttonNum;
+    }
+    //buttonNum 1,10,100のボタンを押した時
+    if (checkButton(180,200,30)){
+      buttonNum=1;
+    }else if (checkButton(215,200,30)){
+      buttonNum=10;
+    }else if (checkButton(250,200,30)){
+      buttonNum=100;
+    }
+  },
+};
+
+window.addEventListener('load',function(){
+	window.app = new unitaro.App(APP);
+},false);
+
+</script>
+</body>
+</html>
